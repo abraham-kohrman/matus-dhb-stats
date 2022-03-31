@@ -3,16 +3,16 @@ close all;
 %% read the stuff in
 tic
 replace = 0;
-allData = importXLSfile('C:\Users\data\Desktop\20200901_Stats_Package\demo_traces_data.xlsx'); %full path to the data file, including the filename of the data.xlsx file. 
+allData = importXLSfile('/home/posfailab/Documents/emergencyMeeting/Nanog_Spreadsheet.xls'); %full path to the data file, including the filename of the data.xlsx file. 
 
-basedir = 'C:\Users\data\Desktop\20200901_Stats_Package\'; %path to the folder where the comparison_table.xlsx is located. Also the directory that will contain the outputs!
+basedir = '/home/posfailab/Documents/emergencyMeeting/'; %path to the folder where the comparison_table.xlsx is located. Also the directory that will contain the outputs!
 
 time_stamp = datestr(datetime('now'));
 time_stamp = strrep(time_stamp,':','.'); 
-savedir = [basedir time_stamp '\'];
+savedir = [basedir time_stamp '/'];
 mkdir(savedir);
 %% start here if resetting to avoid reloading large datasets into memory.  
-[comparison_code,headers] = xlsread([ basedir 'demo_traces_comparison_table.xlsx']); %filename of the comparison_table.xlsx file. You can name it whatever you want. 
+[comparison_code,headers] = xlsread([ basedir 'diagonal_board.xls']); %filename of the comparison_table.xlsx file. You can name it whatever you want. 
 keylist = allData.keys()
 
 stretchDataset1 = 0; %do not use this mode
@@ -31,9 +31,9 @@ delta_function_islist = 1; %which delta function to use (list =1, use this mode)
 % dataset1LenRealTime = 97;
 % dataset2LenRealTime = size(dataset2,1);
 
-num_reps = 10000; %number of simulations 
-maxLenRealTime = 60; %clip length
-maxLen = 60; %clip length, equal unless stretching. Which you shouldn't be.
+num_reps = 1000000; %number of simulations 
+maxLenRealTime = 179; %clip length
+maxLen = 179; %clip length, equal unless stretching. Which you shouldn't be.
 
 
 %% Script begins. 
@@ -282,6 +282,11 @@ for aye = 1:size(headers,1)-1
         end
     end
 end
+resultsTable = array2table(string(horzcat({'XX'},keylist))');
+for aye = 1:length(keylist)
+    resultsTable.(char(keylist(aye))) = results_matrix(:,aye); 
+end
+writetable( resultsTable,[savedir 'human_readable_results.xlsx'])
 csvwrite([savedir 'results.csv'],results_matrix);
 save([savedir 'distro_mat.mat'], 'value_matrix');
 
